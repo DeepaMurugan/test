@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+    
+   <!-- <a href="#" style="margin-top:2em;float:right;">Delete admin cookie</a> -->
+    
+    <a href="/admin/landing_page/deleteadmincookie" style="margin-top:2em;float:right;">Delete admin cookie</a>
+    
+   
+   
+    <h1>Admin Land</h1>
+    <hr>
+
+    <a href="/admin/landing_page/create">
+        <button class="get-started-btn btn-green" style="float:right;font-size:1em;">Create landing page draft</button>
+    </a>
+    <h2>Custom Landing Pages</h2>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Status</th>
+            <th>URL</th>
+            <th>Actions</th>
+        </thead>
+        {% for page in pages %}
+            <tr>
+                {% if (page.status == 'draft') %}
+                <td style="color:darkorange;">Draft</td>
+                {% elseif (page.status == 'publish') %}
+                <td style="color:limegreen;">Public</td>
+                {% else %}
+                <td style="color:indianred;">Deleted</td>
+                {% endif %}
+                <td><a href= {{ '/' ~ page.url ~ '/'}} target="_blank">/{{ page.url }}/</a> <span style="color:lightgrey;font-size:0.75em;"
+                                                                                class="glyphicon glyphicon-new-window"></span>
+                </td>
+                <td>
+                    {% if page.status == 'draft' %}
+                    <form action= {{ "/admin/landing_page/" ~ page.id ~ "/publish/"}} method="post" style="display:inline-block">
+                        <input type="submit" value="publish" style="color:#2D95EC;border:0px;background:transparent;"/>
+                    </form>
+                    {% elseif page.status == 'publish' %}
+                    <form action= {{ "/admin/landing_page/" ~ page.id ~ "/unpublish/"}} method="post" style="display:inline-block">
+                        <input type="submit" value="unpublish" style="color:#2D95EC;border:0px;background:transparent;"/>
+                    </form>
+                    {% else %}
+                    <text style="color:#a8a8a8;">publish</text>
+                    {% endif %}
+                    <span style="margin: 0 1em;color:lightgrey;">|</span>
+                    {% if page.status != 'deleted' %}
+                    <a type="submit" href= {{ "/admin/landing_page/" ~ page.id ~ "/edit/"}}>edit</a>
+                    {% else %}
+                    <text style="color:#a8a8a8;">edit</text>
+                    {% endif %}
+                    <span style="margin: 0 1em;color:lightgrey;">|</span>
+                    {% if (page.status != 'deleted') %}
+                    <form action= {{ "/admin/landing_page/" ~ page.id ~ "/delete/"}} method="post" style="display:inline-block">
+                        <input type="submit" value="delete" style="color:indianred;border:0px;background:transparent;"/>
+                    </form>
+                    {% else %}
+                    <text style="color:#a8a8a8;">deleted</text>
+                    {% endif %}
+                    <span style="margin: 0 1em;color:lightgrey;">|</span>
+                    last modified by: <text style="color:#2D95EC">{{ page.last_modified_by }}</text>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+		// Handles all events for changing template thumbnails
+        var templateView = {
+            // Changes height of template-container div for proper hover states
+            calculateProperHeight: function() {
+                $('.template-image-container').each(function() {
+                    var containerHeight = $(this).height();
+                    $(this).parent().css('height', containerHeight);
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            // Calculate proper height for templates on first load and further ones
+            templateView.calculateProperHeight();
+            $(window).on('load resize', templateView.calculateProperHeight);
+
+            // Show signup buttons onhover for template thumbnails
+            $('.template-container').mouseover(function() {
+                $(this).find('.template-overlay-container').css('opacity', 1);
+            }).mouseleave(function() {
+                $(this).find('.template-overlay-container').css('opacity', 0);
+            });
+        });
+    </script>
+{% endblock %}
